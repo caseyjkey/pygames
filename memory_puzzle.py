@@ -12,10 +12,10 @@ BOXSIZE      = 40  # box height and width in pixels
 GAPSIZE      = 10  # space between boxes
 BOARDWIDTH   = 10  # number of columns of icons
 BOARDHEIGTH  = 7   # number of rows and icons
-assert (BOARDWIDTH * BOARDHEIHT) % 2 is 0, "Board needs to have an even number of boxes for pairs of matches."
+assert (BOARDWIDTH * BOARDHEIGTH) % 2 is 0, "Board needs to have an even number of boxes for pairs of matches."
 TILESIZE     = BOXSIZE + GAPSIZE
 XMARGIN      = int((WINDOWWIDTH - (BOARDWIDTH * TILESIZE)) / 2)
-YMARGIN      = int((WINDOWHEIGHT - (BOARDHEIGHT * TILESIZE)) / 2)
+YMARGIN      = int((WINDOWHEIGHT - (BOARDHEIGTH * TILESIZE)) / 2)
 
 #            R    G    B
 GRAY     = (100, 100, 100)
@@ -70,7 +70,23 @@ def main():
         DISPLAYSURF.fill(BGCOLOR) # drawing the window
         drawBoard(mainBoard, revealedBoxes)
 
-""" End of main game loop """
+        for event in pygame.event.get():
+            if event.type is QUIT or (event.type is KEYUP and event.type is K_ESCAPE):
+                pygame.quit()
+                sys.exit()
+            elif event.type is MOUSEMOTION:
+                mousex, mousey = event.pos
+            elif event.type is MOUSEBUTTONUP:
+                mousex, mousey = event.pos
+                mouseClicked = True
+
+        boxx, boxy = getBoxAtPixel(mousex, mousey)
+        if boxx != None and boxy != None:
+            # The mouse is currently over a box
+        if not revealedBoxes[boxx][boxy]:
+            drawHighlightBox(boxx, boxy)
+
+""" -------------------- End of main game loop ----------------------------------------"""
 
 """ Helper methods for main """
 def getRandomizedBoard():
@@ -115,6 +131,15 @@ def leftTopCoordsOfBox(boxx, boxy):
     top = boxy * (BOXSIZE + GAPSIZE) + YMARGIN
     return (left, top)
 
+def getBoxAtPixel(x, y):
+    for boxx in range(BOARDWIDTH):
+        for boxy in range(BOARDHEIGTH):
+            left, top = leftTopCoordsOfBox(x, y)
+            boxRect = pygame.draw.rect(left, top, BOXSIZE, BOXSIZE)
+            if boxRect.collidepoint(x, y): # if x, y is within the box, return the box
+                return (boxx, boxy)
+    return (None, None)
+
 def getShapeAndColor(board, boxx, boxy):
     # shape value for x, y spot is stored in board[x][y][0]
     # color value for x, y spot is stored in board[x][y][1]
@@ -140,7 +165,6 @@ def drawIcon(shape, color, boxx, boxy):
             pygame.draw.line(DISPLAYSURF, color, (left + i, top + BOXSIZE - 1), (left + BOXSIZE - 1, top + i))
     elif shape is OVAL:
         pygame.draw.ellipse(DISPLAYSURF, color, (left, top + quarter, BOXSIZE, half))
-
 
 def drawBoxCovers(board, boxes, coverage):
     # Draws boxes being covered/revealed. "boxes" is a list
@@ -175,8 +199,8 @@ def drawBoard(board, revealed):
                 pygame.draw.rect(DISPLAYSURF, BOXCOLOR, (left, top, BOXSIZE, BOXSIZE))
             else:
                 # Draw the (revealed) icon
-
-
+                shape, color = getShapeAndColor(board, boxx, boxy)
+                drawIcon(shape, color, boxx, boxy)
 
 def startGameAnimation(board):
     # randomly reveal the boxes 8 at a time
@@ -192,6 +216,8 @@ def startGameAnimation(board):
     for boxGroup in boxGroups:
         revealBoxesAnimation(board, boxGroup)
         coverBoxesAnimation(board, boxGroup)
+
+
 
 
 
