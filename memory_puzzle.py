@@ -85,7 +85,7 @@ def main():
             if not revealedBoxes[boxx][boxy]:
                 drawHighlightBox(boxx, boxy)
             if not revealedBoxes[boxx][boxy] and mouseClicked:
-                revealBoxesAnimation(mainBoard, (boxx, boxy))
+                revealBoxesAnimation(mainBoard, [(boxx, boxy)])
                 revealedBoxes[boxx][boxy] = True
 
                 if firstSelection == None: # This box was the first box clicked
@@ -202,12 +202,12 @@ def drawIcon(shape, color, boxx, boxy):
 def drawBoxCovers(board, boxes, coverage):
     # Draws boxes being covered/revealed. "boxes" is a list
     # of two item tuples, which have the x & y spot of the box
-    for box in boxes: # get a single x, y tuple pair from boxes
-        left, top = leftTopCoordsOfBox(box[0], box[1]) # here we find top-left corner of box pixel coordinates
+    for box in boxes:  # get a single x, y tuple pair from boxes
+        left, top = leftTopCoordsOfBox(box[0], box[1])  # here we find top-left corner of box pixel coordinates
         pygame.draw.rect(DISPLAYSURF, BGCOLOR, (left, top, BOXSIZE, BOXSIZE))
         shape, color = getShapeAndColor(board, box[0], box[1])
         drawIcon(shape, color, box[0], box[1])
-        if coverage > 0: # only draw covers if there is coverage
+        if coverage > 0:  # only draw covers if there is coverage
             pygame.draw.rect(DISPLAYSURF, BOXCOLOR, (left, top, coverage, BOXSIZE))
     pygame.display.update()
     FPSCLOCK.tick(FPS)
