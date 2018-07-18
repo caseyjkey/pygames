@@ -1,5 +1,4 @@
 # Memory Puzzle
-
 import random, pygame, sys
 from pygame.locals import *
 
@@ -49,34 +48,34 @@ assert len(ALLCOLORS) * len(ALLSHAPES) * 2 >= BOARDWIDTH * BOARDHEIGTH, "Board i
 def main():
     global FPSCLOCK, DISPLAYSURF
     pygame.init()
-    FPSCLOCK    = pygame.time.Clock()
+    FPSCLOCK = pygame.time.Clock()
     DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT), 0, 32)
 
-    mousex = 0 # stores x coordinate of mouse event
-    mousey = 0 # stores y coordinate of mouse event
+    mousex = 0  # stores x coordinate of mouse event
+    mousey = 0  # stores y coordinate of mouse event
     pygame.display.set_caption("Memory Game")
 
     mainBoard = getRandomizedBoard()
     revealedBoxes = generateRevealedBoxesData(False)
 
-    firstSelection = None # stores the (x, y) of the first box clicked
+    firstSelection = None  # stores the (x, y) of the first box clicked
 
     DISPLAYSURF.fill(BGCOLOR)
     startGameAnimation(mainBoard)
 
-    while(True): # main game loop
+    while True:  # main game loop
         mouseClicked = False
 
-        DISPLAYSURF.fill(BGCOLOR) # drawing the window
+        DISPLAYSURF.fill(BGCOLOR)  # drawing the window
         drawBoard(mainBoard, revealedBoxes)
 
         for event in pygame.event.get():
-            if event.type is QUIT or (event.type is KEYUP and event.type is K_ESCAPE):
+            if event.type == QUIT or (event.type == KEYUP and event.key == K_ESCAPE):
                 pygame.quit()
                 sys.exit()
-            elif event.type is MOUSEMOTION:
+            elif event.type == MOUSEMOTION:
                 mousex, mousey = event.pos
-            elif event.type is MOUSEBUTTONUP:
+            elif event.type == MOUSEBUTTONUP:
                 mousex, mousey = event.pos
                 mouseClicked = True
 
@@ -101,12 +100,25 @@ def main():
                         coverBoxesAnimation(mainBoard, [(firstSelection[0], firstSelection[1]), (boxx, boxy)])
                         revealedBoxes[firstSelection[0]][firstSelection[1]] = False
                         revealedBoxes[boxx][boxy] = False
-                    elif hasWon(revealedBoxes):
+                    elif hasWon(revealedBoxes): # check if all boxes are revealed
+                        gameWonAnimation(mainBoard)
+                        pygame.time.wait(2000)
 
+                        # Reset the board
+                        mainBoard = getRandomizedBoard()
+                        revealedBoxes = generateRevealedBoxesData(False)
 
+                        # Show the fully unrevealed board for a second.
+                        drawBoard(mainBoard, revealedBoxes)
+                        pygame.display.update()
+                        pygame.time.wait(1000)
 
-
-
+                        # Replay the start game animation
+                        startGameAnimation(mainBoard)
+                    firstSelection = None
+            # Redraw the screen and wait a clock tick
+            pygame.display.update()
+            FPSCLOCK.tick(FPS)
 """ -------------------- End of main game loop ----------------------------------------"""
 
 """ Helper methods for main """
@@ -155,8 +167,8 @@ def leftTopCoordsOfBox(boxx, boxy):
 def getBoxAtPixel(x, y):
     for boxx in range(BOARDWIDTH):
         for boxy in range(BOARDHEIGTH):
-            left, top = leftTopCoordsOfBox(x, y)
-            boxRect = pygame.draw.rect(left, top, BOXSIZE, BOXSIZE)
+            left, top = leftTopCoordsOfBox(boxx, boxy)
+            boxRect = pygame.Rect(left, top, BOXSIZE, BOXSIZE)
             if boxRect.collidepoint(x, y): # if x, y is within the box, return the box
                 return (boxx, boxy)
     return (None, None)
@@ -248,10 +260,20 @@ def hasWon(revealedBoxes):
             return False
     return True
 
+def gameWonAnimation(board):
+    # flash the background color when the player has won
+    coveredBoxes = generateRevealedBoxesData(True) # set to true for drawBoard method below
+    color1 = LIGHTBGCOLOR
+    color2 = BGCOLOR
 
-
-
-
+    for i in range(13):
+        color1, color2 = color2, color1 # swap colors
+        DISPLAYSURF.fill(color1)
+        drawBoard(board, coveredBoxes)
+        pygame.display.update()
+        pygame.time.wait(300)
 
 """ End of helper methods for main """
 
+if __name__ == "__main__":
+    main()
