@@ -83,8 +83,29 @@ def main():
         boxx, boxy = getBoxAtPixel(mousex, mousey)
         if boxx != None and boxy != None:
             # The mouse is currently over a box
-        if not revealedBoxes[boxx][boxy]:
-            drawHighlightBox(boxx, boxy)
+            if not revealedBoxes[boxx][boxy]:
+                drawHighlightBox(boxx, boxy)
+            if not revealedBoxes[boxx][boxy] and mouseClicked:
+                revealBoxesAnimation(mainBoard, (boxx, boxy))
+                revealedBoxes[boxx][boxy] = True
+
+                if firstSelection == None: # This box was the first box clicked
+                    firstSelection = (boxx, boxy)
+                else: # The current box was the second one clicked
+                    icon1shape, icon1color = getShapeAndColor(mainBoard, firstSelection[0], firstSelection[1])
+                    icon2shape, icon2color = getShapeAndColor(mainBoard, boxx, boxy)
+
+                    # Icons don't match, recover both selections
+                    if icon1shape != icon2shape or icon1color != icon2color:
+                        pygame.time.wait(1000)
+                        coverBoxesAnimation(mainBoard, [(firstSelection[0], firstSelection[1]), (boxx, boxy)])
+                        revealedBoxes[firstSelection[0]][firstSelection[1]] = False
+                        revealedBoxes[boxx][boxy] = False
+                    elif hasWon(revealedBoxes):
+
+
+
+
 
 """ -------------------- End of main game loop ----------------------------------------"""
 
@@ -202,6 +223,10 @@ def drawBoard(board, revealed):
                 shape, color = getShapeAndColor(board, boxx, boxy)
                 drawIcon(shape, color, boxx, boxy)
 
+def drawHighlightBox(boxx, boxy):
+    left, top = leftTopCoordsOfBox(boxx, boxy)
+    pygame.draw.rect(DISPLAYSURF, HIGHLIGHTCOLOR, (left-5, top-5, BOXSIZE+10, BOXSIZE+10), 4)
+
 def startGameAnimation(board):
     # randomly reveal the boxes 8 at a time
     coveredBoxes = generateRevealedBoxesData(False)
@@ -216,6 +241,12 @@ def startGameAnimation(board):
     for boxGroup in boxGroups:
         revealBoxesAnimation(board, boxGroup)
         coverBoxesAnimation(board, boxGroup)
+
+def hasWon(revealedBoxes):
+    for i in revealedBoxes: # data structure representing the board as an [x][y] pairs
+        if False in i: # This checks for a False value in the x column
+            return False
+    return True
 
 
 
