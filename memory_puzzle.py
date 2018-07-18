@@ -1,4 +1,6 @@
 # Memory Puzzle
+# Casey Key July 14, 2018
+# http://whatspython.com
 import random, pygame, sys
 from pygame.locals import *
 
@@ -53,7 +55,7 @@ def main():
 
     mousex = 0  # stores x coordinate of mouse event
     mousey = 0  # stores y coordinate of mouse event
-    pygame.display.set_caption("Memory Game")
+    pygame.display.set_caption("Memory Puzzle")
 
     mainBoard = getRandomizedBoard()
     revealedBoxes = generateRevealedBoxesData(False)
@@ -252,6 +254,7 @@ def startGameAnimation(board):
     drawBoard(board, coveredBoxes)
     for boxGroup in boxGroups:
         revealBoxesAnimation(board, boxGroup)
+        pygame.time.wait(2000)
         coverBoxesAnimation(board, boxGroup)
 
 def hasWon(revealedBoxes):
