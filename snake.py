@@ -33,4 +33,24 @@ RIGHT = 'right'
 
 HEAD = 0 # Syntactic sugar, 0 is the Snake's head
 
-def main:
+def main():
+    global FPSCLOCK, DISPLAYSURF, BASICFONT
+
+    pygame.init() # always init pygame at start of game
+    FPSCLOCK = pygame.time.Clock()
+    DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
+    BASICFONT = pygame.font.Font("cooperblackstdopentype", 18)
+    pygame.display.set_caption('Snake Game')
+
+    showStartScreen()
+    while True: # main game loop
+        runGame()
+        showGameOverScreen()
+
+def showStartScreen():
+    titleFont = pygame.font.Font("cooperblackstdopentype", 100)
+    titleSurf1 = titleFont.render('Snake!', True, WHITE, DARKGREEN)
+    titleSurf2 = titleFont.render('Snake!', True, GREEN)
+
+    degrees1 = 0
+    degrees2 = 0
