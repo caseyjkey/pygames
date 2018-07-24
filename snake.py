@@ -129,6 +129,6 @@ def runGame():
         if direction == UP:
             newHead = {'x': wormCoords[HEAD]['x'], 'y': wormCoords[HEAD]['y'] - 1}
         elif direction == DOWN:
-            newHead = {'x': wormCoords[]}
+            newHead = {'x': wormCoords[HEAD]['x'] - 1, 'y': wormCoords[HEAD]['y']}
 
 
