@@ -125,6 +125,7 @@ def runGame():
             del wormCoords[-1]  # remove worm's tail segment
 
         # move the worm by adding a segment in the direction it is moving
+        # TODO: Check if moved already, it is possible to move twice in one tick.
         if direction == UP:
             newHead = {'x': wormCoords[HEAD]['x'], 'y': wormCoords[HEAD]['y'] - 1}
         elif direction == DOWN:
